@@ -1,5 +1,13 @@
-curl --version > /dev/null 2>&1 &&
-jq --version > /dev/null 2>&1 &&
+not_available="" &&
+for cmd in curl jq docker git poetry; do
+  if ! command -v "$cmd" &>/dev/null; then
+    not_available+=("$cmd")
+  fi
+done &&
+if (( ${#not_available[@]} > 0 )); then
+  echo "Установите следующие пакеты: ${not_available[@]}" 1>&2
+  exit 1
+fi &&
 config=$(jq -r '.config' ./.env.json) &&
 source=$(jq -r '.source' $config) &&
 gitlab_host=$(jq -r '.gitlab_host' $config) &&
