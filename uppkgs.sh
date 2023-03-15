@@ -12,6 +12,7 @@ source_branch=feature/${ticket}-packages-updating &&
 token=$(jq -r '.token' $config) &&
 packages=$(jq -r '.packages' $config)
 cd ~"$source" &&
+docker --version > /dev/null 2>&1 &&
 for repo in $(echo $repos | jq -r 'join(" ")')
 do
   repo_pkgs=$(jq -r '.repos."'$repo'".packages' $config) &&
