@@ -1,5 +1,4 @@
 {
-  "config": "uppkgs/.env.json",
   "source": "/path_to_repos/",
   "gitlab_host": "https://gitlab.example.com/api/v4/",
   "repo_keys": [
