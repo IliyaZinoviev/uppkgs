@@ -1,3 +1,17 @@
+function retry {
+    command=$1
+    message="$2"
+    retval=1
+    is_end=''
+    until [[ $retval -eq 0 ]] || [[ $is_end == "y" ]]; do
+        eval $command
+        retval=$?
+        if [[ $retval -ne 0 ]]; then
+          read "?${message} и после нажмите Enter для продолжения." is_end
+        fi
+    done
+}
+
 if [ -z "$1" ]
   then
     echo "Передайте абсолютный путь к конфигу." 1>&2
@@ -5,7 +19,7 @@ if [ -z "$1" ]
 fi
 
 not_available=() &&
-for cmd in curl jq docker git poetry pytest; do
+for cmd in curl jq docker git poetry pre-commit; do
   if ! command -v "$cmd" &>/dev/null; then
     not_available+=("$cmd")
   fi
@@ -47,9 +61,10 @@ do
     poetry add new_package
   done &&
   source "$(poetry env info --path)"/bin/activate &&
-  pytest -x || read "?Почините тесты и после можете продолжить скрипт, нажав Enter" &&
+  retry "pytest -x" "Почините тесты" &&
+  retry "pre-commit install" "Настройте pre-commit" &&
   commit=(git commit -a -m "$ticket $commit_message." -m "[ci skip]") &&
-  $commit || $commit || read "?Поправьте формат кода и после можете продолжить скрипт, нажав Enter" || $commit || $commit &&
+  retry "${commit[@]} || ${commit[@]}" "Поправьте формат кода и после можете продолжить скрипт, нажав Enter" &&
   git push origin HEAD &&
   body='{
           "title": "'$ticket' '$commit_message'",
