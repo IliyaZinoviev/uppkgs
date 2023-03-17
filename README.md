@@ -22,3 +22,9 @@ _**example.config.json** - пример структуры конфигурац�
 ```zsh
 zsh uppkgs.sh /some_absolute_path_to/config_file.json
 ```
+### Для глобального доступа:
+```zsh
+echo alias uppkgs="/some_absolute_path_to/uppkgs.sh" >> ~/.zshrc
+source ~/.zshrc
+chmod +x /path_to_uppkgs_sh/uppkgs.sh
+```
