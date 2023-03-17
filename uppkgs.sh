@@ -3,11 +3,15 @@ function retry {
     message="$2"
     retval=1
     is_end=''
-    until [[ $retval -eq 0 ]] || [[ $is_end == "y" ]]; do
+    until [[ $retval -eq 0 ]]; do
         eval $command
         retval=$?
         if [[ $retval -ne 0 ]]; then
-          read "?${message} и после нажмите Enter для продолжения." is_end
+          read "?${message} и после нажмите Enter для продолжения. (Введите \"y\" для завершения скрипта)" is_end
+        fi
+        if [[ $is_end == "y" ]]; then
+          echo "Выполнение прервано." 1>&2
+          exit 0
         fi
     done
 }
@@ -44,7 +48,7 @@ packages=$(jq -r '.packages' $config)
 cd "$source" &&
 for repo in $(echo $repos | jq -r 'join(" ")')
 do
-
+  echo "Обновление зависимостей в ${repo} начато." &&
   repo_pkgs=$(jq -r '.repos."'$repo'".packages' $config) &&
   target_branch=$(jq -r '.repos."'$repo'".target_branch' $config) &&
   branch_title=$(echo $repo_pkgs | jq -r 'join("-")' ) &&
@@ -78,5 +82,7 @@ do
     -H "Content-Type: application/json" \
     -d "$body" ${gitlab_host}/projects/${project_id}/merge_requests &&
   deactivate &&
-  cd ../
-done
+  cd ../ &&
+  echo "Обновление зависимостей в ${repo} завершено."
+done &&
+echo "uppkgs успешно завершил работу!"
