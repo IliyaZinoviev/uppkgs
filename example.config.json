@@ -12,7 +12,15 @@
         "some_package"
       ],
       "target_branch": "master",
-      "project_id": 1
+      "project_id": 1,
+      "mr_id": 1,
+      "is_need_changes": true,
+      "branch": {
+        "dir": "feature",
+        "suffix": "some_feature"
+      },
+      "pre_handler": "some_command",
+      "post_handler": "some_command"
     }
   },
   "packages": {
